@@ -41,11 +41,11 @@ class BST(object):
         if node.e < e and node.right_node is None:
             node.right_node = Node(e)
         elif node.e < e and node.right_node is not None:
-            return self._add(node.right_node, e)
+            self._add(node.right_node, e)
         elif node.e > e and node.left_node is None:
             node.left_node = Node(e)
         elif node.e > e and node.left_node is not None:
-            return self._add(node.left_node, e)
+            self._add(node.left_node, e)
         else:
             return
 
@@ -115,7 +115,7 @@ class BST(object):
     def minimum(self):
         return self._minimum(self.root)
 
-    def _minimum(self, node:Node):
+    def _minimum(self, node: Node):
         if not node:
             return
         if node.left_node:
