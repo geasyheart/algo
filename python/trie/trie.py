@@ -1,4 +1,4 @@
-from typing import Dict
+from typing import Dict, List, Iterable
 
 
 class Node(object):
@@ -15,8 +15,12 @@ class Trie(object):
     def get_size(self) -> int:
         return self.size
 
-    # 向Trie添加一个单词
     def add(self, word: str):
+        """
+        向Trie添加一个单词
+        :param word:
+        :return:
+        """
         cur: Node = self.root
         for c in word:
             if cur.next.get(c) is None:
@@ -28,6 +32,11 @@ class Trie(object):
 
     # 查询
     def contains(self, word: str) -> bool:
+        """
+        判断是否包含这个word
+        :param word:
+        :return:
+        """
         cur: Node = self.root
         for c in word:
             if cur.next.get(c) is None:
@@ -35,9 +44,10 @@ class Trie(object):
             cur = cur.next.get(c)
         return cur.is_word
 
-    # 通过前缀索引的方式进行匹配是否存在这个单词
     def has_prefix(self, prefix: str) -> bool:
         """
+        通过前缀索引的方式进行匹配是否存在这个单词
+
         trie: 我爱中国
         prefix: 我爱
         :param prefix: 
@@ -85,11 +95,32 @@ class Trie(object):
                     return True
             return False
 
-    def delete(self, word: str):
+    def keys(self, prefix: str) -> List[str]:
         """
-        情况1: single tree(继续往上找，然后删除此word)
-        情况2: 最后一个被其他引用(将最后一个char的is_word标志成false，如果不是true,则忽略)
-        :param word:
+        获取符合的字符串
+        :param prefix:
         :return:
         """
-        pass
+        _all: List[str] = []
+        # 此处这个方法和has_prefix一样
+        cur: Node = self.root
+        for c in prefix:
+            if cur.next.get(c) is None:
+                return _all
+            cur = cur.next.get(c)
+        self._get_keys(node=cur, prefix=prefix, result=_all)
+        return _all
+
+    def _get_keys(self, node: Node, prefix: str, result: List[str]):
+        if node.is_word:
+            result.append(prefix)
+
+        for _char, next_node in node.next.items():
+            next_word = f"{prefix}{_char}"
+            if next_node.is_word:
+                result.append(next_word)
+            else:
+                self._get_keys(node=next_node, prefix=next_word, result=result)
+
+    def iter_keys(self, prefix: str) -> Iterable[str]:
+        raise NotImplementedError
