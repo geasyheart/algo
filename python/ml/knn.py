@@ -1,9 +1,8 @@
 import math
 from collections import Counter
-from sklearn.neighbors import KNeighborsClassifier
-import numpy as np
 
-import matplotlib.pyplot as plt
+import numpy as np
+from sklearn.neighbors import KNeighborsClassifier
 
 raw_data_X = [
     [3.393533211, 2.3312733811, ],
@@ -51,7 +50,7 @@ class KNNClassifier(object):
         #  (欧拉距离)
         distances = []
         for x_train in self.x:
-            d = math.sqrt(np.sum(x_train - x) ** 2)
+            d = math.sqrt(np.sum((x_train - x) ** 2))
             distances.append(d)
         nearest = np.argsort(distances)
         topk_y = [self.y[i] for i in nearest[:self.k]]
