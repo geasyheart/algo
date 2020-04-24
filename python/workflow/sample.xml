@@ -1,0 +1,75 @@
+
+<process id="基础招聘流程">
+<userTask id="apply" name="应聘" color="#9EB4E2" feedback_control="" cancel_control="">
+  <form model="apply" />
+  <assign>hr</assign>
+  <transition to="longlist" formModel="longlist" skipForm="0" quickAdd="1" onlyForCancel="0"/>
+  <transition to="cvsent" formModel="cvsent" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="clientinterview" formModel="clientinterview" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="offersign" formModel="offersign" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="pendingboard" formModel="pendingboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="onboard" formModel="onboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="reject" formModel="reject" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+</userTask>
+<userTask id="longlist" name="筛选通过" color="#5BB3DA" feedback_control="" cancel_control="">
+  <form model="longlist" />
+  <assign>hr</assign>
+  <transition to="cvsent" formModel="cvsent" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="clientinterview" formModel="clientinterview" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="offersign" formModel="offersign" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="pendingboard" formModel="pendingboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="onboard" formModel="onboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="reject" formModel="reject" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+</userTask>
+<userTask id="cvsent" name="用人部门评审" color="#65CDCC" feedback_control="continue" cancel_control="rollback">
+  <form model="cvsent" />
+  <assign>hr</assign>
+  <transition to="cvsent" formModel="cvsent" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="clientinterview" formModel="clientinterview" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="offersign" formModel="offersign" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="pendingboard" formModel="pendingboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="onboard" formModel="onboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="reject" formModel="reject" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+</userTask>
+<userTask id="clientinterview" name="面试" color="#4c9fff" feedback_control="continue" cancel_control="">
+  <form model="clientinterview" />
+  <assign>hr</assign>
+  <transition to="cvsent" formModel="cvsent" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="clientinterview" formModel="clientinterview" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="offersign" formModel="offersign" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="pendingboard" formModel="pendingboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="onboard" formModel="onboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="reject" formModel="reject" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+</userTask>
+<userTask id="offersign" name="Offer" color="#FFA200" feedback_control="continue" cancel_control="record">
+  <form model="offersign" />
+  <assign>hr</assign>
+  <transition to="cvsent" formModel="cvsent" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="clientinterview" formModel="clientinterview" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="offersign" formModel="offersign" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="pendingboard" formModel="pendingboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="onboard" formModel="onboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="reject" formModel="reject" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+</userTask>
+<userTask id="pendingboard" name="待入职" color="#E6507A" feedback_control="" cancel_control="rollback">
+  <form model="pendingboard" />
+  <assign>hr</assign>
+  <transition to="onboard" formModel="onboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="reject" formModel="reject" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+</userTask>
+<userTask id="onboard" name="入职" color="#E6507A" feedback_control="" cancel_control="rollback">
+  <form model="onboard" />
+  <assign>hr</assign>
+  <transition to="cvsent" formModel="cvsent" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="clientinterview" formModel="clientinterview" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="offersign" formModel="offersign" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="pendingboard" formModel="pendingboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="onboard" formModel="onboard" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+  <transition to="reject" formModel="reject" skipForm="0" quickAdd="0" onlyForCancel="0"/>
+</userTask>
+<userTask id="reject" name="淘汰" color="#333333" feedback_control="" cancel_control="">
+  <form model="reject" />
+  <assign>hr</assign>
+</userTask>
+</process>
+

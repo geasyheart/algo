@@ -1,0 +1,28 @@
+<workFlow id="测试流程图">
+
+    <processNode id="process-1" name="流程节点1">
+        <transition to="process-2"/>
+    </processNode>
+
+    <processNode id="process-2" name="流程节点2">
+        <transition to="process-3"/>
+    </processNode>
+
+    <decisionNode id="process-3" name="流程节点3">
+        <true-transition to="process-4" />
+        <false-transition to="process-5" />
+    </decisionNode>
+
+    <processNode id="process-4" name="流程节点4">
+    </processNode>
+
+    <processNode id="process-5" name="流程节点5">
+        <transition to="process-6"/>
+    </processNode>
+
+    <decisionNode id="process-6" name="流程节点6">
+        <false-transition to="process-2" />
+    </decisionNode>
+
+
+</workFlow>
