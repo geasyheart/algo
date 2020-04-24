@@ -1,10 +1,21 @@
 # coding=utf-8
-from dataclasses import dataclass
-from typing import Any, Optional
+from typing import Any
 
 
-@dataclass
 class Condition(object):
-    name: str = ""
-    condition: Any = None
-    parent_node: Any = None
+    def __init__(
+            self,
+            key: str = "",
+            condition: Any = None,
+            parent_node: Any = None
+    ):
+        self.key = key
+        self.condition = condition
+        self.parent_node = parent_node
+
+    def to_json(self):
+        return {
+            "key": self.key,
+            "condition": self.condition,  # 这里能不能展示？
+            "parent_node": self.parent_node.to_json()
+        }

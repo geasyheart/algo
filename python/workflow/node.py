@@ -1,14 +1,16 @@
 # coding=utf-8
-from typing import Set, Type, Optional, Dict, Any
+from typing import Set, Type, Dict, Any
+
 from condition import Condition
 
 
 class Node(object):
     def __init__(self, key=""):
         self.key = key
+        self.attrib: Dict[str, Any] = {}
+
         self.parents: Set[Type[Node]] = set()
         self.childrens: Set[Type[Node]] = set()
-        self.attrib: Dict[str, Any] = {}
 
     def set_attrib(self, attrib: Dict[str, Any]):
         self.attrib = attrib
@@ -19,6 +21,10 @@ class Node(object):
     def add_children(self, children: Type['Node']):
         self.childrens.add(children)
 
+    def current_available_transition(self):
+        for parent in self.parents:
+            pass
+
     def __repr__(self):
         return f"<{self.__class__.__name__}>: {self.key}"
 
@@ -26,6 +32,12 @@ class Node(object):
 class ProcessNode(Node):
     def __init__(self, key=""):
         super(ProcessNode, self).__init__(key=key)
+
+    def to_json(self):
+        return {
+            "key": self.key,
+            "attrib": self.attrib
+        }
 
 
 class DecisionNode(Node):
@@ -43,6 +55,16 @@ class DecisionNode(Node):
         self.condition.update({
             name: condition
         })
+
+    def to_json(self):
+        return {
+            "key": self.key,
+            "attrib": self.attrib,
+            "condition": {
+                key: condition.to_json()
+                for key, condition in self.condition.items()
+            }
+        }
 
 
 class DummyNode(Node):
