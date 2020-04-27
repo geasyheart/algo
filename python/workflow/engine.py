@@ -56,3 +56,28 @@ class WorkflowEngine(object):
                     return _condition.parent_node
         else:
             return
+
+    def auto_flow(self):
+        """
+        自动流转
+        :return:
+        """
+        # all_available_nodes = ["process-1",,, "process-6"]
+        # for cur_node in all_available_nodes:
+            # condition = read_result_from_caled_result(cur_node_condition)
+            # next_step = self.next_step(cur_node, condition)
+            # yield next_step
+
+    def trigger(self, node):
+        """
+        基于触发器的方式进行自动流转
+        :return:
+        """
+        action = node.get_todo_action()
+        action.apply_async(
+            args=None,
+            kwargs=None,
+            eta=None,
+            countdown=3,
+            priority=None
+        )
