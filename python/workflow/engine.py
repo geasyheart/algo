@@ -1,4 +1,5 @@
 # coding=utf-8
+import copy
 from typing import Optional, List, Dict, Any
 
 from graph import Graph
@@ -31,4 +32,27 @@ class WorkflowEngine(object):
 
         return result
 
-
+    def next_step(self, node_id: str, condition: Any = None):
+        """
+        如果为ProcessNode，则直接通过
+        如果为DecisionNode，则根据输入(condition)判断condition条件，从而获得下一个流转node
+        :param node_id:
+        :param condition: 具体计算不在这里计算，此处condition直接为最终算的结果，然后根据设置的condition结果进行判断应该走哪个流程
+        :return:
+        """
+        node: Optional[ProcessNode, DecisionNode] = self.local_graph.node_map[node_id]
+        # ProcessNode只有一个流转方向，所以直接返回parents第一个
+        if isinstance(node, ProcessNode):
+            copy_parents = copy.deepcopy(node.parents)
+            if len(copy_parents) != 0:
+                return copy_parents.pop()
+            else:
+                return None
+        # DecisionNode有多个流转方向，根据输入算出结果然后获取下一个流转node
+        elif isinstance(node, DecisionNode):
+            for key, _condition in node.condition.items():
+                # 结果相等并且结果类型相同
+                if _condition.condition == condition and type(_condition.condition) == type(condition):
+                    return _condition.parent_node
+        else:
+            return

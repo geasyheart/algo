@@ -82,3 +82,80 @@ class TestWorkFlow(TestCase):
             result = work_engine.current_available_transition(node_id=node_id)
             print(node_id.center(60, '-'))
             pprint(result, indent=2)
+
+    def test_next_step(self):
+        work_engine = WorkflowEngine("./sample2.xml")
+        for node_id in ("process-1", "process-2", "process-3", "process-4", "process-5", "process-6"):
+            if node_id == "process-1":
+                self.assertIsInstance(
+                    work_engine.next_step(node_id=node_id), ProcessNode
+                )
+                self.assertEqual(
+                    work_engine.next_step(node_id=node_id).key, "process-2"
+                )
+            elif node_id == "process-2":
+                self.assertIsInstance(
+                    work_engine.next_step(node_id=node_id), DecisionNode
+                )
+                self.assertEqual(
+                    work_engine.next_step(node_id=node_id).key,
+                    "process-3"
+                )
+            elif node_id == "process-3":
+                # 获取下一个节点，不是DecisionNode
+                self.assertIsInstance(
+                    work_engine.next_step(node_id=node_id, condition=True), ProcessNode
+                )
+                self.assertIsInstance(
+                    work_engine.next_step(node_id=node_id, condition=False), ProcessNode
+                )
+                self.assertIsNone(
+                    work_engine.next_step(node_id=node_id, condition=None)
+                )
+                self.assertIsNone(
+                    work_engine.next_step(node_id=node_id, condition=1)  # 类型不相同
+                )
+
+                # 条件为True的时候
+                self.assertEqual(
+                    work_engine.next_step(node_id=node_id, condition=True).key,
+                    "process-4"
+                )
+                # 条件为False的时候
+                self.assertEqual(
+                    work_engine.next_step(node_id=node_id, condition=False).key,
+                    "process-5"
+                )
+            elif node_id == "process-4":
+                self.assertIsNone(
+                    work_engine.next_step(node_id=node_id)
+                )
+            elif node_id == "process-5":
+                self.assertIsInstance(
+                    work_engine.next_step(node_id=node_id), DecisionNode
+                )
+                self.assertEqual(
+                    work_engine.next_step(node_id=node_id).key,
+                    "process-6"
+                )
+            elif node_id == "process-6":
+                # 获取下一个节点，不是DecisionNode
+                self.assertIsInstance(
+                    work_engine.next_step(node_id=node_id, condition=False), ProcessNode
+                )
+                self.assertIsNone(
+                    work_engine.next_step(node_id=node_id, condition=None)
+                )
+                self.assertIsNone(
+                    work_engine.next_step(node_id=node_id, condition=1)  # 类型不相同
+                )
+
+                # 条件为True的时候，因为没有下一个node
+                self.assertIsNone(
+                    work_engine.next_step(node_id=node_id, condition=True),
+                )
+                # 条件为False的时候
+                self.assertEqual(
+                    work_engine.next_step(node_id=node_id, condition=False).key,
+                    "process-2"
+                )

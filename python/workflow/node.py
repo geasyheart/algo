@@ -21,10 +21,6 @@ class Node(object):
     def add_children(self, children: Type['Node']):
         self.childrens.add(children)
 
-    def current_available_transition(self):
-        for parent in self.parents:
-            pass
-
     def __repr__(self):
         return f"<{self.__class__.__name__}>: {self.key}"
 
