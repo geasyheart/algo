@@ -30,4 +30,8 @@ X_test = standard_scaler.transform(X_test)
 
 sgd_reg = SGDRegressor(n_iter_no_change=1e5, max_iter=1e6, verbose=2)
 sgd_reg.fit(X_train, y_train)
+print(sgd_reg.score(
+    y_test,
+    sgd_reg.predict(X_test)
+))
 # plt.show()
