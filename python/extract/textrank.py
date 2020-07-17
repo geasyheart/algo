@@ -101,7 +101,7 @@ class TextRank(object):
         return (wp[1] in self.pos_filt and len(wp[0].strip()) >= 2
                 and wp[0].lower() not in self.stop_words)
 
-    def textrank(self, words: List, topK=20, withWeight=False, allowPOS=('n', 'nnt', 'nx', 'nz', 'nt', 'nr',),
+    def textrank(self, words: List, topK=20, withWeight=False, allowPOS=('ns', 'n', 'vn', 'v'),
                  withFlag=False):
         """
         :param words: [("我", "n"), ("word", "nature")]
