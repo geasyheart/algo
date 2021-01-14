@@ -112,4 +112,4 @@ if __name__ == '__main__':
     mxEnt.load_data('gameLocation.txt')
     mxEnt.train()
     # [(0.9976966633113571, 'Outdoor'), (0.0023033366886429235, 'Indoor')]
-    print(mxEnt.predict('Sunny'))
+    print(mxEnt.predict('Sunny Sad'))
