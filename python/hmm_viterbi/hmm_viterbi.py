@@ -37,14 +37,15 @@ emission_probability = {
 # 打印路径概率表
 def print_dptable(V):
     print("    ")
-    for i in range(len(V)): print("%7d" % i)
+    for i in range(len(V)):
+        print("%7d" % i)
     print()
+
     for y in V[0].keys():
         print("%.5s: " % y)
         for t in range(len(V)):
             print("%.7s" % ("%f" % V[t][y]))
         print()
-
 
 def viterbi(obs, states, start_p, trans_p, emit_p):
     """
@@ -102,11 +103,22 @@ def viterbi(obs, states, start_p, trans_p, emit_p):
         print('__________________________________________')
 
     print_dptable(V)
+    # ts = []
+    # for y in states:
+    #     t = (V[len(obs) - 1][y], y)
+    #     ts.append(t)
+    # prob, state = max(ts)
+
     (prob, state) = max([(V[len(obs) - 1][y], y) for y in states])
-    return (prob, path[state])
+    return prob, path[state]
 
 
 def example():
+    """
+    根据 `观察序列` 预测 `隐状态` 以及`概率`
+    https://zh.wikipedia.org/wiki/%E7%BB%B4%E7%89%B9%E6%AF%94%E7%AE%97%E6%B3%95
+
+    """
     return viterbi(observations,
                    states,
                    start_probability,
