@@ -2,7 +2,6 @@
 #
 import torch
 from torch import nn
-import torch.nn.functional as F
 from torch import optim
 
 
@@ -48,11 +47,14 @@ class LSTMTagger(nn.Module):
         self.hidden2tag = nn.Linear(hidden_dim, tagset_size)
 
     def forward(self, sentence):
-        embeds = self.word_embeddings(sentence)
-        lstm_out, _ = self.lstm(embeds.view(len(sentence), 1, -1))
-        tag_space = self.hidden2tag(lstm_out.view(len(sentence), -1))
-        tag_scores = F.log_softmax(tag_space, dim=1)
-        return tag_scores
+        # 更改成(batch_size, sequence_length, 32)
+        embeds = self.word_embeddings(sentence.unsqueeze(dim=0))
+        # (batch_size, sequence_length, 16)
+        lstm_out, _ = self.lstm(embeds)
+        # (batch_size, sequence_length, 3)
+        tag_space = self.hidden2tag(lstm_out)
+        # 只不过在这个例子batch_size=1
+        return tag_space
 
 
 model = LSTMTagger(EMBEDDING_DIM, HIDDEN_DIM, len(word_to_ix), len(tag_to_ix))
@@ -84,7 +86,10 @@ for epoch in range(300):  # again, normally you would NOT do 300 epochs, it is t
 
         # Step 4. Compute the loss, gradients, and update the parameters by
         #  calling optimizer.step()
-        loss = loss_function(tag_scores, targets)
+        mask = torch.ones(size=(1, len(sentence)), dtype=torch.bool)
+        # batch_size, sequence_length, feature = tag_scores.shape
+        # tag_scores[mask] == tag_scores.view(batch_size * sequence_length, -1)
+        loss = loss_function(tag_scores[mask], targets)
         loss.backward()
         optimizer.step()
 
