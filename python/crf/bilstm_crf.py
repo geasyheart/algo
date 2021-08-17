@@ -3,11 +3,11 @@
 # Author: Robert Guthrie
 
 import torch
-import torch.autograd as autograd
 import torch.nn as nn
 import torch.optim as optim
 
 torch.manual_seed(1)
+
 
 def argmax(vec):
     # return the argmax as a python int
@@ -16,16 +16,18 @@ def argmax(vec):
 
 
 def prepare_sequence(seq, to_ix):
+    """把序列变成ids"""
     idxs = [to_ix[w] for w in seq]
     return torch.tensor(idxs, dtype=torch.long)
 
 
 # Compute log sum exp in a numerically stable way for the forward algorithm
 def log_sum_exp(vec):
+    """这个函数实现了log(指数相加)"""
     max_score = vec[0, argmax(vec)]
     max_score_broadcast = max_score.view(1, -1).expand(1, vec.size()[1])
     return max_score + \
-        torch.log(torch.sum(torch.exp(vec - max_score_broadcast)))
+           torch.log(torch.sum(torch.exp(vec - max_score_broadcast)))
 
 
 class BiLSTM_CRF(nn.Module):
@@ -47,6 +49,7 @@ class BiLSTM_CRF(nn.Module):
 
         # Matrix of transition parameters.  Entry i,j is the score of
         # transitioning *to* i *from* j.
+        # 状态转移概率矩阵，即所有输出的概率矩阵
         self.transitions = nn.Parameter(
             torch.randn(self.tagset_size, self.tagset_size))
 
@@ -71,15 +74,18 @@ class BiLSTM_CRF(nn.Module):
         forward_var = init_alphas
 
         # Iterate through the sentence
+        # 遍历每一个词
         for feat in feats:
-            alphas_t = []  # The forward tensors at this timestep
+            alphas_t = []  # The forward tensors at this timestep，当前时刻的前向概率
             for next_tag in range(self.tagset_size):
                 # broadcast the emission score: it is the same regardless of
                 # the previous tag
+                # 发射概率
                 emit_score = feat[next_tag].view(
                     1, -1).expand(1, self.tagset_size)
                 # the ith entry of trans_score is the score of transitioning to
                 # next_tag from i
+                # 状态转移概率
                 trans_score = self.transitions[next_tag].view(1, -1)
                 # The ith entry of next_tag_var is the value for the
                 # edge (i -> next_tag) before we do log-sum-exp
@@ -88,11 +94,13 @@ class BiLSTM_CRF(nn.Module):
                 # scores.
                 alphas_t.append(log_sum_exp(next_tag_var).view(1))
             forward_var = torch.cat(alphas_t).view(1, -1)
+        # 求和
         terminal_var = forward_var + self.transitions[self.tag_to_ix[STOP_TAG]]
         alpha = log_sum_exp(terminal_var)
         return alpha
 
     def _get_lstm_features(self, sentence):
+        """获取lstm的计算特征."""
         self.hidden = self.init_hidden()
         embeds = self.word_embeds(sentence).view(len(sentence), 1, -1)
         lstm_out, self.hidden = self.lstm(embeds, self.hidden)
@@ -106,7 +114,7 @@ class BiLSTM_CRF(nn.Module):
         tags = torch.cat([torch.tensor([self.tag_to_ix[START_TAG]], dtype=torch.long), tags])
         for i, feat in enumerate(feats):
             score = score + \
-                self.transitions[tags[i + 1], tags[i]] + feat[tags[i + 1]]
+                    self.transitions[tags[i + 1], tags[i]] + feat[tags[i + 1]]
         score = score + self.transitions[self.tag_to_ix[STOP_TAG], tags[-1]]
         return score
 
@@ -155,18 +163,24 @@ class BiLSTM_CRF(nn.Module):
         return path_score, best_path
 
     def neg_log_likelihood(self, sentence, tags):
+        """计算loss值"""
         feats = self._get_lstm_features(sentence)
+        # 计算所有路径的打分结果和
         forward_score = self._forward_alg(feats)
+        # 获取分子项(log后的那部分)的计算结果，也即序列的打分结果
         gold_score = self._score_sentence(feats, tags)
         return forward_score - gold_score
 
     def forward(self, sentence):  # dont confuse this with _forward_alg above.
         # Get the emission scores from the BiLSTM
+        # 获取lstm输出特征，也即上一句表示那样，即获取发射分数
         lstm_feats = self._get_lstm_features(sentence)
 
         # Find the best path, given the features.
+        # 使用viterbi算法动态规划获取最优路径解
         score, tag_seq = self._viterbi_decode(lstm_feats)
         return score, tag_seq
+
 
 START_TAG = "<START>"
 STOP_TAG = "<STOP>"
