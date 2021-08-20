@@ -38,6 +38,9 @@ class MLP(object):
         self.derivatives = derivatives
 
     def forward_propagate(self, inputs):
+        """
+        前向过程，activations保存每一层linear的结果,公式y = sigmoid(wx)
+        """
         activations = inputs
 
         self.activations[0] = inputs
@@ -49,10 +52,13 @@ class MLP(object):
         return activations
 
     def back_propagate(self, error, verbose=False):
-        # dE/dW_i = (y - a_[i+1]) s'(h_[i+1])) a_i
-        # s'(h_[i+1]) = s(h_[i+1])(1 - s(h_[i+1]))
-        # s(h_[i+1]) = a_[i+1]
-        # dE/dW_[i-1] = (y - a_[i+1]) s'(h_[i+1])) W_i s'(h_i) a_[i-1]
+        """
+        反向过程，
+
+        error = error * sigmoid导数 * 上一层的结果
+        derivative = W(i) * sigmoid导数 * 上一层的结果
+
+        """
 
         for i in reversed(range(len(self.derivatives))):
             activations = self.activations[i + 1]
