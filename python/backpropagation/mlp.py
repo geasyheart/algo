@@ -14,6 +14,7 @@ class MLP(object):
         layers = [num_inputs] + hidden_layers + [num_outputs]
 
         # 创建随机权重，表示多个linear的权重汇总
+        # 如果weight的初始化值为0的话，可以看到error下降的非常不明显
         weights = []
 
         for i in range(len(layers) - 1):
@@ -68,6 +69,7 @@ class MLP(object):
             current_activations_reshaped = current_activations.reshape(current_activations.shape[0], -1)
             self.derivatives[i] = np.dot(current_activations_reshaped, delta_reshaped)
             # 权重过大或过小会导致梯度消失或者爆炸
+            # 误差传播，拿到上一层的误差
             error = np.dot(delta, self.weights[i].T)
 
             if verbose:
@@ -76,9 +78,8 @@ class MLP(object):
 
     def gradient_descent(self, learning_rate):
         for i in range(len(self.weights)):
-            weights = self.weights[i]
             derivatives = self.derivatives[i]
-            weights += derivatives * learning_rate
+            self.weights[i] += derivatives * learning_rate
 
     def train(self, inputs, targets, epochs, learning_rate):
         for i in range(epochs):
