@@ -1,7 +1,7 @@
 # -*- coding: utf8 -*-
 #
 from torch.nn import Embedding, Sigmoid, Linear
-from torch.nn.modules.rnn import RNN
+from torch.nn.modules.rnn import RNN, LSTM
 
 import torch
 from torch.nn import BCELoss
@@ -12,7 +12,7 @@ class RNNModel(torch.nn.Module):
     def __init__(self):
         super(RNNModel, self).__init__()
         self.embed = Embedding(6, 30)
-        self.rnn = RNN(input_size=30, hidden_size=4, batch_first=True, num_layers=10)
+        self.rnn = LSTM(input_size=30, hidden_size=4, batch_first=True, num_layers=10)
         self.linear = Linear(4, 1)
 
     def forward(self, input):
