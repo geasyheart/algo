@@ -81,11 +81,13 @@ class BiLSTM_CRF(nn.Module):
                 # broadcast the emission score: it is the same regardless of
                 # the previous tag
                 # 发射概率
+                # feat[next_tag] : tensor(-0.2473, grad_fn=<SelectBackward>)
+                # tensor([[-0.2473, -0.2473, -0.2473, -0.2473, -0.2473]], grad_fn=<ExpandBackward>)
                 emit_score = feat[next_tag].view(
                     1, -1).expand(1, self.tagset_size)
                 # the ith entry of trans_score is the score of transitioning to
                 # next_tag from i
-                # 状态转移概率
+                # 状态转移概率, 这个一般横是前一状态，列是后一状态，这里反过来了，表示从其他tag转移到当前tag的概率分布
                 trans_score = self.transitions[next_tag].view(1, -1)
                 # The ith entry of next_tag_var is the value for the
                 # edge (i -> next_tag) before we do log-sum-exp
@@ -113,8 +115,8 @@ class BiLSTM_CRF(nn.Module):
         score = torch.zeros(1)
         tags = torch.cat([torch.tensor([self.tag_to_ix[START_TAG]], dtype=torch.long), tags])
         for i, feat in enumerate(feats):
-            score = score + \
-                    self.transitions[tags[i + 1], tags[i]] + feat[tags[i + 1]]
+            # 注意这里哦，self.transitions[tags[i + 1], tags[i]]， 这里横表示后一状态
+            score = score + self.transitions[tags[i + 1], tags[i]] + feat[tags[i + 1]]
         score = score + self.transitions[self.tag_to_ix[STOP_TAG], tags[-1]]
         return score
 
