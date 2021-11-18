@@ -23,8 +23,8 @@ import thulac
 #
 # 1. download addr: http://down.xshuyaya.cc/zip/%E5%89%91%E6%9D%A5.zip
 # 2. 分词
-# thu1 = thulac.thulac(seg_only=True)
-# thu1.cut_f('剑来.txt', 'p_output.txt')
+thu1 = thulac.thulac(seg_only=True)
+thu1.cut_f('剑来.txt', 'p_output.txt')
 
 # 3. 预处理
 # 标点符号集

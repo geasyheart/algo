@@ -1,9 +1,9 @@
 # -*- coding: utf8 -*-
 #
 import torch
+from torch import nn
 from torch.optim import SGD
 from torch.utils.data import Dataset, DataLoader
-
 from torch.utils.data.dataset import T_co
 
 from python.forward_examples.linear_layer import MLP
@@ -30,6 +30,12 @@ class MyDataSet(Dataset):
         return DataLoader(self, batch_size=32)
 
 
+def torch_imp_bceloss(y_pred, y_true):
+    y_pred = torch.sigmoid(y_pred)
+    loss_func = nn.BCELoss()
+    return loss_func(y_pred, y_true)
+
+
 def train():
     d = MyDataSet().to_dataloader()
 
@@ -44,6 +50,9 @@ def train():
             y_pred = mlp(x)
 
             loss = bce_loss_with_logit(y_pred, y)
+            torch_loss = torch_imp_bceloss(y_pred, y)
+            if loss.item() != torch_loss.item():
+                raise ValueError(f'loss not equal torch bce loss, {loss.item()}, {torch_loss.item()}')
             total_loss += loss.item()
             loss.backward()
 
