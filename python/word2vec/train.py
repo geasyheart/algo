@@ -70,15 +70,17 @@ class WordEmbeddingDataset(tud.Dataset):
         pos_indices = [i % len(self.text_encoded) for i in
                        pos_indices]  # 为了避免索引越界，所以进行取余处理，如：设总词数为100，则[1]取余为[1]，而[101]取余为[1]
         pos_words = self.text_encoded[pos_indices]  # tensor(list)操作，取出所有周围词
-        neg_words = torch.multinomial(self.word_freqs, K * pos_words.shape[0], True)
+        neg_indices = torch.multinomial(self.word_freqs, K * pos_words.shape[0], True)
+        neg_words = self.text_encoded[neg_indices]
         # torch.multinomial作用是对self.word_freqs做K * pos_words.shape[0]次取值，输出的是self.word_freqs对应的下标
         # 取样方式采用有放回的采样，并且self.word_freqs数值越大，取样概率越大
         # 实际上从这里就可以看出，这里用的是skip-gram方法，并且采用负采样（Negative Sampling）进行优化
 
         # while 循环是为了保证 neg_words中不能包含周围词
         # Angel Hair：实际上不需要这么处理，因为我们遇到的都是非常大的数据，会导致取到周围词的概率非常非常小，这里之所以这么做是因为本文和参考文所提供的数据太小，导致这个概率变大了，会影响模型
-        while len(set(pos_indices) & set(neg_words.numpy().tolist())) > 0:
-            neg_words = torch.multinomial(self.word_freqs, K * pos_words.shape[0], True)
+        while len(set(pos_indices) & set(neg_indices.numpy().tolist())) > 0:
+            neg_indices = torch.multinomial(self.word_freqs, K * pos_words.shape[0], True)
+            neg_words = self.text_encoded[neg_indices]
 
         return center_words, pos_words, neg_words
 
