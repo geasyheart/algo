@@ -24,19 +24,19 @@ class TestWorkFlow(TestCase):
                 self.assertEqual(node.attrib['name'], "流程节点1")
 
                 self.assertEqual(len(node.childrens), 0)
-                self.assertEqual(len(node.parents), 1)
-                self.assertEqual([i.key for i in node.parents], ['process-2'])
+                self.assertEqual(len(node.lefts), 1)
+                self.assertEqual([i.key for i in node.lefts], ['process-2'])
 
             elif id_ == "process-2":
                 self.assertEqual(node.key, "process-2")
                 self.assertEqual(node.attrib['name'], "流程节点2")
                 self.assertEqual(len(node.childrens), 2)
-                self.assertEqual(len(node.parents), 1)
+                self.assertEqual(len(node.lefts), 1)
 
                 self.assertIn("process-1", [i.key for i in node.childrens])
                 self.assertIn("process-6", [i.key for i in node.childrens])
 
-                self.assertEqual([i.key for i in node.parents], ["process-3"])
+                self.assertEqual([i.key for i in node.lefts], ["process-3"])
 
             elif id_ == "process-3":
                 self.assertIsInstance(node, DecisionNode)

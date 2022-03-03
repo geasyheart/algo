@@ -134,7 +134,7 @@ class MigrationGraph(object):
                 visited.append(node.key)
             else:
                 stack.append((node, True))
-                stack += [(n, False) for n in sorted(node.parents if forwards else node.children)]
+                stack += [(n, False) for n in sorted(node.lefts if forwards else node.rights)]
         return visited
 
     ROOT = 1

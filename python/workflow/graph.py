@@ -50,9 +50,9 @@ class Graph(object):
     def add_dependencies(self):
         for node_ele in self.workflow_obj.iterchildren():
             for transition_edge_ele in node_ele.iterchildren():
-                self.node_map[node_ele.attrib['id']].add_parent(
-                    parent=self.node_map[transition_edge_ele.attrib['to']])
-                self.node_map[transition_edge_ele.attrib['to']].add_children(
+                self.node_map[node_ele.attrib['id']].add_left(
+                    left=self.node_map[transition_edge_ele.attrib['to']])
+                self.node_map[transition_edge_ele.attrib['to']].add_right(
                     children=self.node_map[node_ele.attrib['id']])
 
         # 条件node特殊处理

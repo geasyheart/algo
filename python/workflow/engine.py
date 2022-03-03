@@ -24,7 +24,7 @@ class WorkflowEngine(object):
         :return:
         """
         node: Optional[ProcessNode, DecisionNode] = self.local_graph.node_map[node_id]
-        can_flow_nodes = node.parents
+        can_flow_nodes = node.lefts
 
         result = []
         for can_flow_node in can_flow_nodes:

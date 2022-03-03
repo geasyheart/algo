@@ -7,7 +7,7 @@ from textrank import TextRank
 
 def cut_with_hanlp(sentence):
     result = posseg.lcut(sentence)
-    return [(i.word, i.flag) for i in result]
+    return [(i.token, i.flag) for i in result]
 
 text = """
 中国博物馆故宫天安门
