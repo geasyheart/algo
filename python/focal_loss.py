@@ -76,15 +76,15 @@ def my_cross_entropy(input, target, reduction="mean"):
         return log.sum()
 
 if __name__ == '__main__':
+    # 比如预测的很准的情况下
     input = torch.tensor([[0.1, 0.9], [0.9, 0.1]])
     target = torch.tensor([1, 0])
-    # example3
-    # input = torch.tensor([[0., 1.], [1., 0.]])
-    # target = torch.tensor([1, 0])
-    loss1_mean = F.cross_entropy(input, target)
-    loss2_mean = my_cross_entropy(input, target)
-    print(loss1_mean)
-    print(loss2_mean)
+    print(FocalLoss(2)(input, target))
+    # 预测不准的情况下
+    input = torch.tensor([[0.9, 0.1], [0.1, 0.9]])
+    target = torch.tensor([1, 0])
+    print(FocalLoss(2)(input, target))
 
-    f = FocalLoss(num_labels=2)
-    f(input, target)
+    # 总结，看torch.pow((1 - logits), self.gamma)这里
+    # 可以看到，当预测准的情况下，1-logits就会变得很小，那么最终loss就会很小（因为有one_hot_key，所以只会关注正确的标签的logits）
+    # 预测不准的情况下,1-logits就会变得很大，torch.pow本质来讲就是选择一个gamma来做平滑，其他项暂跳过...
