@@ -77,7 +77,11 @@ def eval_result():
         had_rate_movies, recommend_movies = view(userid=userId)
         rate_size += had_rate_movies
         recommend_same_size += recommend_movies
+    # 随机 random walk
     # 0.3500782151213342
+    # 直接按照权重最高的进行random walk
+    # 0.053764018740918885
+    # 从而可以看出，在不优化代码的前提下，更改随机游走方式是可以影响最终评判结果的
     print(recommend_same_size / rate_size)
 
 
