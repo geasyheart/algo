@@ -35,20 +35,20 @@ def random_walk(G, path_len: int, start_node=None):
             # 1、不考虑边的权重
             # path.extend(random.sample(G.adj[cur_node].keys(), 1))
             # 2、考虑边的权重进行采样
-            # l, p = [], []
-            # for node, info in G.adj[cur_node].items():
-            #     weight = info.get('weight', 0)
-            #     l.append(node)
-            #     p.append(weight)
-            # sum_p = sum(p)
-            # p = [i / sum_p for i in p]
+            l, p = [], []
+            for node, info in G.adj[cur_node].items():
+                weight = info.get('weight', 0)
+                l.append(node)
+                p.append(weight)
+            sum_p = sum(p)
+            p = [i / sum_p for i in p]
             # print(p)
-            # path.extend(random_sample_by_weight(l=l, p=p))
-            # 3、直接按照评分最高的进行随机游走
-            node_weights = [(node, info.get('weight', 0)) for node, info in G.adj[cur_node].items()]
+            path.extend(random_sample_by_weight(l=l, p=p))
+            # 3、直接按照评分最高的进行随机游走, 注意，这样一定会生成大量重复数据，所以真实使用时不能按照这种方式
+            # node_weights = [(node, info.get('weight', 0)) for node, info in G.adj[cur_node].items()]
             # print(node_weights)
-            node, highest_weight = sorted(node_weights, key=lambda x: x[1], reverse=True)[0]
-            path.append(node)
+            # node, highest_weight = sorted(node_weights, key=lambda x: x[1], reverse=True)[0]
+            # path.append(node)
         else:
             break
     return path
