@@ -1,27 +1,53 @@
 # -*- coding: utf8 -*-
 #
 import torch
-from torch import nn
-from transformers.models.bert.modeling_bert import BertSelfAttention
+
+# 这个是对https://mp.weixin.qq.com/s/G_sU1c3UGfHRZ2FVCT6Ucw这篇文章的一个理解实现
+
+# ################## 构造矩阵 ##################
+# 比如早上好分别用[1,2,1,2,1],[1,1,3,2,1]和[3,1,2,1,1]表示，那矩阵如下:
+a = torch.tensor([
+    [1, 2, 1, 2, 1],  # 早
+    [1, 1, 3, 2, 1],  # 上
+    [3, 1, 2, 1, 1]  # 好
+], dtype=torch.float)
+# ################## a和a.T的内积形成一个方阵 ##################
+
+attention = torch.matmul(a, a.T)
+print(attention)
+#     早   上   好
+# 早  11  11  10
+# 上  11  16  13
+# 好  10  13  16
+
+# 可以看到，早->上(11)，早->好(10)，同理，上-> 早(11)，好->早(10)
 
 
-class Config(object):
-    hidden_size = 4
-    num_attention_heads = 1
-    attention_probs_dropout_prob = 0.1
+# ################## softmax是干啥的，不就是归一化嘛，约束到加和为1 ##################
+softmax_attention = attention.softmax(-1)
+print(softmax_attention)
+# tensor([[0.4223, 0.4223, 0.1554],
+#         [0.0064, 0.9465, 0.0471],
+#         [0.0024, 0.0473, 0.9503]])
+
+# 这里[0.4223, 0.4223, 0.1554]不就代表早分别对早 上 好 的权重了嘛
+
+# ################### 和v点积 #######################
 
 
-attn = BertSelfAttention(Config())
-attn.query = nn.Identity()
-attn.key = nn.Identity()
-attn.value = nn.Identity()
+# qk再和a点积
+out = softmax_attention.matmul(a)
+print(out)
+# tensor([[1.3107, 1.4223, 2.0000, 1.8446, 1.0000],
+#         [1.0942, 1.0064, 2.9401, 1.9529, 1.0000],
+#         [2.9007, 1.0024, 2.0450, 1.0497, 1.0000]])
 
-if __name__ == '__main__':
-    # 比如
-    # 我： [1,2,3,4]
-    # 你: [5,6,7,8]
-    # 这里表示一个batch
-    # 可以看到attention的计算
-    input = torch.tensor([[1., 2., 3., 4.], [5., 6., 7., 8.]]).reshape(1, 2, 4)
-    attn(input)
+
+# 比如早：[1.3107, 1.4223, 2.0000, 1.8446, 1.0000]
+0.4 * 1 + 0.4 * 1 + 0.2 * 3
+0.4 * 2 + 0.4 * 1 + 0.2 * 1
+0.4 * 1 + 0.4 * 3 + 0.2 * 2
+0.4 * 2 + 0.4 * 2 + 0.2 * 1
+0.4 * 1 + 0.4 * 1 + 0.2 * 1
+
 
