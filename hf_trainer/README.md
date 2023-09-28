@@ -1,0 +1,3 @@
+encoder结构的请看multi*之类的
+
+encoder-decoder结构的请看t5_demo，尤其train3.py，自定义了evaluation阶段采用generation策略。
