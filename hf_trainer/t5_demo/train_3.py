@@ -1,13 +1,15 @@
 # -*- coding: utf8 -*-
 #
-import logging
 
+import numpy as np
 from datasets import load_dataset
 from transformers import T5Tokenizer, T5ForConditionalGeneration, Seq2SeqTrainingArguments, DataCollatorForSeq2Seq, \
-    Seq2SeqTrainer, GenerationConfig
+    Seq2SeqTrainer
 from transformers.utils import logging
-import numpy as np
 
+#
+# 训练阶段使用自定义的generation_config
+#
 pretrained_model_name_or_path = "mengzi-t5-base-mt"
 
 train_data = '/data/.tmpyz/train.jsonl'
@@ -71,16 +73,17 @@ class QTDMetric(Metric):
 logging.set_verbosity_info()
 model = T5ForConditionalGeneration.from_pretrained(pretrained_model_name_or_path)
 tokenizer = T5Tokenizer.from_pretrained(pretrained_model_name_or_path)
+
+gen_config = model.generation_config
+gen_config.do_sample = True
+gen_config.max_length = 64
+gen_config.top_p = 0.95
+gen_config.top_k = 50
+gen_config.temperature = 0.3
+gen_config.repetition_penalty = 1.3
 training_args = Seq2SeqTrainingArguments(
     predict_with_generate=True,
-    generation_config=GenerationConfig(
-        do_sample=True,
-        max_length=64,
-        top_p=0.95,
-        top_k=50, temperature=0.3, repetition_penalty=1.3,
-        early_stopping=True,
-        decoder_start_token_id=model.config.decoder_start_token_id
-    ),
+    generation_config=gen_config,
     output_dir='./output',
     overwrite_output_dir=True,
     do_train=True,
