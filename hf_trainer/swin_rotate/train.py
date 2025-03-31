@@ -21,11 +21,12 @@ from transformers.models.swin.modeling_swin import SwinImageClassifierOutput
 
 os.environ["WANDB_DISABLED"] = "true"
 MODEL_NAME_OR_PATH = './swin-large-patch4-window12-384-in22k/'
+# MODEL_NAME_OR_PATH = './swin-base-patch4-window12-384-in22k'
+
 
 transform = transforms.Compose([
     transforms.ColorJitter(brightness=0.2, contrast=0.2,
                            saturation=0.2, hue=0.1),
-    transforms.RandomResizedCrop(384),
 ])
 
 
@@ -93,12 +94,20 @@ class SwinForRegression(nn.Module):
     def forward(self, pixel_values, labels=None):
         outputs = self.backbone(pixel_values)  # 提取特征
         pooled_output = outputs.pooler_output  # (batch_size, hidden_size)
-        logits = torch.tanh(self.regressor(pooled_output))  # 线性映射到目标维度
+        logits = self.regressor(pooled_output)  # 线性映射到目标维度
 
         loss = None
         if labels is not None:
-            cri = MSELoss()
-            loss = cri(logits, labels)
+            # cri = MSELoss()
+            # loss = cri(logits, labels)
+            pred_sin, pred_cos = logits[:, 0], logits[:, 1]
+            true_sin, true_cos = labels[:, 0], labels[:, 1]
+
+            pred_angle = torch.atan2(pred_sin, pred_cos) * 180.0 / torch.pi
+            true_angle = torch.atan2(true_sin, true_cos) * 180.0 / torch.pi
+            angle_diff = torch.abs(pred_angle - true_angle)
+            angle_diff = torch.min(angle_diff, 360.0 - angle_diff)
+            loss = angle_diff.mean()
 
         return SwinImageClassifierOutput(
             loss=loss,
@@ -183,7 +192,10 @@ def compute_metrics(eval_preds):
             acc += 1
     print(f'ACC: {acc / (total + 1e-5)}')
     print(classification_report(y_true=label_angles, y_pred=pred_angles, ))
-    return {"f1": f1_score(y_true=label_angles, y_pred=pred_angles, labels=list(range(0, 361)), average='macro')}
+    return {
+        "f1": f1_score(y_true=label_angles, y_pred=pred_angles, labels=list(range(0, 361)), average='macro'),
+        "acc": acc / (total + 1e-5),
+    }
 
 
 # 定义 Trainer
